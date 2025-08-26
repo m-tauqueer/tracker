@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wavy Crypto Tracker - Real-time cryptocurrency tracking with beautiful glassmorphism design">
+    <meta name="keywords" content="cryptocurrency, crypto tracker, bitcoin, ethereum, crypto prices">
+    <title>Wavy Crypto Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-brand">
+            <h1>Wavy Crypto Tracker</h1>
+            <div class="brand-subtitle">Real-time cryptocurrency insights</div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for a coin..." aria-label="Search cryptocurrencies">
+            <ul id="suggestions" role="listbox" aria-label="Search suggestions"></ul>
+        </div>
+        <nav class="nav-buttons" role="navigation">
+            <button id="learnBtn" class="nav-btn" aria-label="Learn about cryptocurrencies">
+                <span class="btn-icon">📚</span>
+                Learn
+            </button>
+            <button id="converterBtn" class="nav-btn" aria-label="Currency converter">
+                <span class="btn-icon">💱</span>
+                Converter
+            </button>
+            <button id="infoBtn" class="nav-btn" aria-label="Information and help">
+                <span class="btn-icon">ℹ️</span>
+                Info
+            </button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="main-panel">
+            <div id="coinInfo" class="card coin-info-placeholder">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">🔍</div>
+                    <h2>Select a coin to view details</h2>
+                    <p>Choose from the top coins list or search for any cryptocurrency to get started</p>
+                </div>
+            </div>
+            
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h3>Price Chart</h3>
+                    <div class="time-periods">
+                        <button class="time-btn" data-period="1d" aria-label="1 day view">1D</button>
+                        <button class="time-btn active" data-period="7d" aria-label="7 days view">7D</button>
+                        <button class="time-btn" data-period="1m" aria-label="1 month view">1M</button>
+                        <button class="time-btn" data-period="1y" aria-label="1 year view">1Y</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="coinChart" aria-label="Cryptocurrency price chart"></canvas>
+                </div>
+                
+                <!-- Market Details Section -->
+                <div class="market-details">
+                    <h3>Market Details</h3>
+                    <div class="market-details-grid">
+                        <div class="market-detail-item">
+                            <span class="detail-label">1H Change</span>
+                            <span id="1hChange" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">24H Change</span>
+                            <span id="24hChange" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">7D Change</span>
+                            <span id="7dChange" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">Market Cap</span>
+                            <span id="marketCap" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">Volume (24h)</span>
+                            <span id="volume24h" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">Total Supply</span>
+                            <span id="totalSupply" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">Circulating Supply</span>
+                            <span id="circulatingSupply" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">Max Supply</span>
+                            <span id="maxSupply" class="detail-value">--</span>
+                        </div>
+                        <div class="market-detail-item">
+                            <span class="detail-label">Market Cap Rank</span>
+                            <span id="marketCapRank" class="detail-value">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="coinStats" class="stats-grid">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+        </section>
+        
+        <aside class="sidebar card">
+            <div class="sidebar-header">
+                <h2>Top 10 Coins</h2>
+            </div>
+            <ul id="topCoins" role="list">
+                <!-- Top coins will be populated by JavaScript -->
+            </ul>
+        </aside>
+    </main>
+
+    <!-- Learn Modal -->
+    <div id="learnModal" class="modal" role="dialog" aria-labelledby="learnModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="learnModalTitle">Learn About Cryptocurrencies</h2>
+                <button class="close" onclick="closeModal('learnModal')" aria-label="Close learn modal">&times;</button>
+            </div>
+            <div id="crypto-info-content" class="modal-body">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Price Converter Modal -->
+    <div id="converterModal" class="modal" role="dialog" aria-labelledby="converterModalTitle" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="converterModalTitle">Price Converter</h2>
+                <button class="close" onclick="closeConverterModal()" aria-label="Close converter modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="converter-form">
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" placeholder="Enter amount" value="1" min="0" step="0.000001">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fromCurrency">From (Fiat)</label>
+                            <select id="fromCurrency">
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="JPY">JPY - Japanese Yen</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                                <option value="AUD">Australian Dollar</option>
+                                <option value="CHF">Swiss Franc</option>
+                                <option value="CNY">Chinese Yuan</option>
+                                <option value="INR">Indian Rupee</option>
+                            </select>
+                        </div>
+                        
+                        <div class="swap-container">
+                            <button type="button" class="swap-btn" onclick="swapCurrencies()" aria-label="Swap currencies">
+                                <span>⇄</span>
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="toCurrency">To (Cryptocurrency)</label>
+                            <select id="toCurrency">
+                                <option value="1">Loading cryptocurrencies...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="conversion-result">
+                        <label>Result:</label>
+                        <div class="result-value">
+                            <span id="result">0.000000</span>
+                        </div>
+                        <div class="current-price" id="currentPrice" style="display: none;">
+                            <small>Current Price: <span id="priceValue">--</span></small>
+                        </div>
+                        <div class="conversion-rate" id="conversionRate" style="display: none;">
+                            <small>Rate: <span id="rateValue">--</span></small>
+                        </div>
+                    </div>
+                    
+                    <div class="converter-actions">
+                        <button class="convert-btn" onclick="calculateConversion()">Convert</button>
+                        <button class="reset-btn" onclick="resetConverter()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal" role="dialog" aria-labelledby="infoModalTitle" aria-hidden="true">
+        <div class="modal-header">
+            <h2 id="infoModalTitle">Information & Support</h2>
+            <button class="close" onclick="closeModal('infoModal')" aria-label="Close info modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="info-tabs" role="tablist">
+                <button class="tab-btn active" data-tab="help" role="tab" aria-selected="true" aria-controls="help-tab">Help</button>
+                <button class="tab-btn" data-tab="faq" role="tab" aria-selected="false" aria-controls="faq-tab">FAQ</button>
+                <button class="tab-btn" data-tab="privacy" role="tab" aria-selected="false" aria-controls="privacy-tab">Privacy</button>
+                <button class="tab-btn" data-tab="about" role="tab" aria-selected="false" aria-controls="about-tab">About</button>
+            </div>
+            
+            <div class="tab-content active" id="help-tab" role="tabpanel" aria-labelledby="help-tab">
+                <h3>Help & Support</h3>
+                <p>Need help using Wavy Crypto Tracker? Here's everything you need to know to get started.</p>
+                
+                <div class="help-section">
+                    <h4>Getting Started</h4>
+                    <div class="help-steps">
+                        <div class="step">
+                            <span class="step-number">1</span>
+                            <p>Browse the top 10 cryptocurrencies in the sidebar</p>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <p>Click on any coin to view detailed information</p>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <p>Use the search bar to find specific cryptocurrencies</p>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">4</span>
+                            <p>Switch between different time periods for the price chart</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Email Support:</span>
+                    <span class="info-value">support@wavytracker.com</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Support Hours:</span>
+                    <span class="info-value">Monday - Friday, 9:00 AM - 5:00 PM EST</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Response Time:</span>
+                    <span class="info-value">Within 24 hours</span>
+                </div>
+                
+                <div class="info-item contact-helpline">
+                    <span class="info-label">24/7 Helpline:</span>
+                    <span class="info-value">📞 99999999</span>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="faq-tab" role="tabpanel" aria-labelledby="faq-tab">
+                <h3>Frequently Asked Questions</h3>
+                
+                <div class="faq-item">
+                    <h4>Where does the data come from?</h4>
+                    <p>All cryptocurrency data is sourced from the public CoinLore API, which aggregates information from various exchanges and provides real-time market data.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>How often is the data updated?</h4>
+                    <p>The top coins list refreshes automatically every 60 seconds. All other coin details are fetched in real-time when you select a specific cryptocurrency.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Are the charts real-time?</h4>
+                    <p>The price charts are generated using the current price data and historical patterns. For real-time trading charts, we recommend using dedicated trading platforms.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Can I track my portfolio?</h4>
+                    <p>Currently, this is a tracking tool for viewing cryptocurrency information. Portfolio tracking features are planned for future updates.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Is this financial advice?</h4>
+                    <p>No, this tool is for informational purposes only. Always do your own research and consult with financial advisors before making investment decisions.</p>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="privacy-tab" role="tabpanel" aria-labelledby="privacy-tab">
+                <h3>Privacy Policy</h3>
+                <p>We are committed to protecting your privacy and providing a secure experience.</p>
+                
+                <div class="privacy-section">
+                    <h4>Data Collection</h4>
+                    <ul>
+                        <li>We do not store your personal data on any servers</li>
+                        <li>All interactions with the CoinLore API are anonymous</li>
+                        <li>No cookies are used for tracking purposes</li>
+                        <li>Search queries are not logged or stored</li>
+                    </ul>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>Third-Party Services</h4>
+                    <ul>
+                        <li>CoinLore API: Provides cryptocurrency data</li>
+                        <li>Chart.js: Renders interactive charts</li>
+                        <li>Google Fonts: Provides typography</li>
+                    </ul>
+                </div>
+                
+                <div class="privacy-section">
+                    <h4>Your Rights</h4>
+                    <ul>
+                        <li>Access your data (though we don't collect any)</li>
+                        <li>Request deletion of any stored information</li>
+                        <li>Opt-out of any future data collection</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="about-tab" role="tabpanel" aria-labelledby="about-tab">
+                <h3>About Wavy Crypto Tracker</h3>
+                <p>Wavy Crypto Tracker is a modern, user-friendly cryptocurrency tracking application designed to provide real-time insights into the crypto market.</p>
+                
+                <div class="about-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>Real-time cryptocurrency prices and data</li>
+                        <li>Interactive price charts with multiple timeframes</li>
+                        <li>Comprehensive market statistics</li>
+                        <li>Search functionality for any cryptocurrency</li>
+                        <li>Educational content about cryptocurrencies</li>
+                        <li>Responsive design for all devices</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li>Built with vanilla JavaScript for performance</li>
+                        <li>Modern CSS with glassmorphism effects</li>
+                        <li>Responsive design principles</li>
+                        <li>Accessibility-first approach</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h4>Version</h4>
+                    <p>Current Version: 1.0.1</p>
+                    <p>Last Updated: August 2024</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Love Signature Footer -->
+        <div class="modal-footer">
+            <div class="love-signature">
+                <p>Made with love by <strong>Mohammad Tauqueer</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
